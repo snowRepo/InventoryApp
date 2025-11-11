@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:InventoryApp.ViewModels"
+        x:Class="InventoryApp.Views.DeviceInfoPopup"
+        x:DataType="vm:DeviceInfoPopupViewModel"
+        Title="{Binding Title}"
+        Width="600" 
+        Height="450"
+        MinWidth="400"
+        MinHeight="300"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid RowDefinitions="Auto,*,Auto" Margin="16">
+        <TextBlock Text="{Binding Title}" 
+                   FontSize="18" 
+                   FontWeight="Bold"
+                   Margin="0,0,0,16"/>
+                   
+        <ScrollViewer Grid.Row="1" 
+                     VerticalScrollBarVisibility="Auto">
+            <TextBlock Text="{Binding DeviceInfo}" 
+                      TextWrapping="Wrap"
+                      FontFamily="Consolas, Courier New, monospace"/>
+        </ScrollViewer>
+        
+        <Button Grid.Row="2"
+                Content="Close"
+                HorizontalAlignment="Right"
+                Margin="0,16,0,0"
+                Padding="24,6"
+                MinWidth="100"
+                Command="{Binding CloseCommand}"/>
+    </Grid>
+</Window>

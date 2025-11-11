@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:InventoryApp.ViewModels"
+        x:Class="InventoryApp.Views.MasterPinWindow"
+        Width="380" Height="300"
+        Title="Set master PIN">
+  <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*">
+    <TextBlock Margin="12" FontSize="18" Text="Set a master PIN"/>
+
+    <StackPanel Grid.Row="1" Margin="20" Spacing="8" x:DataType="vm:MasterPinViewModel">
+      <TextBlock Text="Master PIN (4-8 digits)"/>
+      <TextBox Text="{Binding Pin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChar="•"/>
+
+      <TextBlock Text="Confirm PIN" Margin="0,8,0,0"/>
+      <TextBox Text="{Binding ConfirmPin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChar="•"/>
+
+      <TextBlock Foreground="Red" TextWrapping="Wrap" Text="{Binding Error}"/>
+
+      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+        <Button Content="OK" Command="{Binding OkCommand}"/>
+        <Button Content="Cancel" Command="{Binding CancelCommand}"/>
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock Grid.Row="2" Margin="12" Opacity="0.6" FontSize="12" Text="InventoryApp"/>
+  </Grid>
+</Window>

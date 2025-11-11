@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:InventoryApp.ViewModels"
+        x:Class="InventoryApp.Views.LoginWindow"
+        Width="400" Height="320"
+        Title="InventoryApp - Login">
+  <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*">
+    <TextBlock Margin="12" FontSize="18" Text="Sign in"/>
+
+    <StackPanel Grid.Row="1" Margin="20" Spacing="8" x:DataType="vm:LoginViewModel">
+      <TextBlock Text="Username"/>
+      <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+
+      <TextBlock Text="Password" Margin="0,8,0,0"/>
+      <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChar="•"/>
+
+      <TextBlock Foreground="Red" TextWrapping="Wrap" Text="{Binding Error}"/>
+
+      <Button Content="Forgot password?" Command="{Binding ForgotPasswordCommand}" HorizontalAlignment="Left" Classes="accent"/> 
+
+      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+        <Button Content="Login" Command="{Binding LoginCommand}"/>
+        <Button Content="Create an account" Command="{Binding NavigateToRegisterCommand}"/>
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock Grid.Row="2" Margin="12" Opacity="0.6" FontSize="12" Text="InventoryApp"/>
+  </Grid>
+</Window>

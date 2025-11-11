@@ -1,0 +1,160 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:InventoryApp.ViewModels"
+        xmlns:views="using:InventoryApp.Views"
+        xmlns:conv="using:InventoryApp.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="InventoryApp.Views.MainWindow"
+        x:Name="Root"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="InventoryApp"
+        SystemDecorations="Full"
+        ExtendClientAreaToDecorationsHint="False">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Window.DataTemplates>
+        <DataTemplate DataType="vm:DashboardViewModel" x:DataType="vm:DashboardViewModel">
+            <views:DashboardView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ProductsViewModel" x:DataType="vm:ProductsViewModel">
+            <views:ProductsView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ExternalSurfacesViewModel" x:DataType="vm:ExternalSurfacesViewModel">
+            <views:ExternalSurfacesView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:SettingsViewModel" x:DataType="vm:SettingsViewModel">
+            <views:SettingsView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:SalesViewModel" x:DataType="vm:SalesViewModel">
+            <views:SalesView/>
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <Window.Resources>
+        <conv:BoolToBrushConverter x:Key="BoolToBrush"/>
+        <conv:BoolToFontWeightConverter x:Key="BoolToFontWeight"/>
+    </Window.Resources>
+
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="220,*">
+        <Border Grid.ColumnSpan="2" Background="{DynamicResource SystemControlAcrylicWindowBrush}" Padding="0,4">
+            <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" 
+                          Spacing="16" 
+                          Margin="16,8,24,8" 
+                          Grid.Column="1" 
+                          VerticalAlignment="Center" 
+                          HorizontalAlignment="Right">
+                    <Border Background="#F0F4F8" 
+                            CornerRadius="16" 
+                            Padding="12,6" 
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"
+                                    Foreground="#4B5563"
+                                    Width="20"
+                                    Height="20"
+                                    VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Username}" 
+                                     FontWeight="Medium"
+                                     VerticalAlignment="Center"
+                                     Foreground="#1F2937"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Grid.Column="0" Background="#f4f5f7" Margin="8" RowDefinitions="Auto,*,Auto">
+            <StackPanel Spacing="4" Grid.Row="0">
+                <Button x:Name="DashboardButton"
+                        Content="Dashboard"
+                        Command="{Binding ShowDashboardCommand}"
+                        HorizontalAlignment="Stretch"
+                        Background="{Binding IsDashboardActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#D0E2FF|#E6EAF0}"
+                        Foreground="{Binding IsDashboardActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#0B3D91|#111}"
+                        FontWeight="{Binding IsDashboardActive, Converter={StaticResource BoolToFontWeight}}"
+                        Margin="4,2"
+                        Padding="8,10"/>
+                <Button x:Name="ProductsButton"
+                        Content="Products"
+                        Command="{Binding ShowProductsCommand}"
+                        HorizontalAlignment="Stretch"
+                        Background="{Binding IsProductsActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#D0E2FF|#E6EAF0}"
+                        Foreground="{Binding IsProductsActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#0B3D91|#111}"
+                        FontWeight="{Binding IsProductsActive, Converter={StaticResource BoolToFontWeight}}"
+                        Margin="4,2"
+                        Padding="8,10"/>
+                <Button x:Name="SalesButton"
+                        Content="Sales"
+                        Command="{Binding ShowSalesCommand}"
+                        HorizontalAlignment="Stretch"
+                        Background="{Binding IsSalesActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#D0E2FF|#E6EAF0}"
+                        Foreground="{Binding IsSalesActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#0B3D91|#111}"
+                        FontWeight="{Binding IsSalesActive, Converter={StaticResource BoolToFontWeight}}"
+                        Margin="4,2"
+                        Padding="8,10"/>
+                <Button x:Name="ExternalSurfacesButton"
+                        Content="External Surfaces"
+                        Command="{Binding ShowExternalSurfacesCommand}"
+                        HorizontalAlignment="Stretch"
+                        Background="{Binding IsExternalSurfacesActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#D0E2FF|#E6EAF0}"
+                        Foreground="{Binding IsExternalSurfacesActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#0B3D91|#111}"
+                        FontWeight="{Binding IsExternalSurfacesActive, Converter={StaticResource BoolToFontWeight}}"
+                        Margin="4,2"
+                        Padding="8,10"/>
+                <Button x:Name="SettingsButton"
+                        Content="Settings"
+                        Command="{Binding ShowSettingsCommand}"
+                        HorizontalAlignment="Stretch"
+                        Background="{Binding IsSettingsActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#D0E2FF|#E6EAF0}"
+                        Foreground="{Binding IsSettingsActive, Converter={StaticResource BoolToBrush}, ConverterParameter=#0B3D91|#111}"
+                        FontWeight="{Binding IsSettingsActive, Converter={StaticResource BoolToFontWeight}}"
+                        Margin="4,2"
+                        Padding="8,10"/>
+            </StackPanel>
+            <Button Grid.Row="2"
+                    Command="{Binding LogoutCommand}"
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Margin="4,8,4,4"
+                    Padding="8,10">
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                    <PathIcon Data="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+                            Foreground="#E53935"
+                            Width="18"
+                            Height="18"
+                            VerticalAlignment="Center"/>
+                    <TextBlock Text="Logout" 
+                             VerticalAlignment="Center"
+                             Foreground="#E53935"
+                             FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <Border Grid.Row="1" Grid.Column="1" Padding="12">
+            <Grid>
+                <views:DashboardView DataContext="{Binding DashboardVM}"
+                                      IsVisible="{Binding DataContext.IsDashboardActive, ElementName=Root}"/>
+                <views:ProductsView DataContext="{Binding ProductsVM}"
+                                     IsVisible="{Binding DataContext.IsProductsActive, ElementName=Root}"/>
+                <views:SalesView DataContext="{Binding SalesVM}"
+                                  IsVisible="{Binding DataContext.IsSalesActive, ElementName=Root}"/>
+                <views:ExternalSurfacesView DataContext="{Binding ExternalSurfacesVM}"
+                                         IsVisible="{Binding DataContext.IsExternalSurfacesActive, ElementName=Root}"/>
+                <views:SettingsView DataContext="{Binding SettingsVM}"
+                                 IsVisible="{Binding DataContext.IsSettingsActive, ElementName=Root}"/>
+            </Grid>
+        </Border>
+    </Grid>
+
+</Window>

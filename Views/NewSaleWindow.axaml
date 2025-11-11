@@ -1,0 +1,95 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="InventoryApp.Views.NewSaleWindow"
+        Width="500" Height="550"
+        Title="New Sale"
+        SystemDecorations="Full"
+        ExtendClientAreaToDecorationsHint="False">
+  <Border Padding="16">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
+      <TextBlock Text="New Sale" FontSize="18" FontWeight="Bold"/>
+      
+      <!-- Product Search -->
+      <StackPanel Grid.Row="1" Spacing="4">
+        <TextBlock Text="Product"/>
+        <TextBox x:Name="ProductSearchBox" 
+                 Watermark="Type to search products..." 
+                 TextChanged="OnProductSearchChanged"
+                 BorderBrush="#CCCCCC"
+                 BorderThickness="1"/>
+        <Border BorderBrush="#CCCCCC" 
+                BorderThickness="1" 
+                CornerRadius="4"
+                x:Name="ProductResultsBorder"
+                IsVisible="False">
+          <Grid>
+            <ListBox x:Name="ProductResultsList" 
+                     MaxHeight="120" 
+                     Background="White"
+                     SelectionChanged="OnProductSelected"/>
+            <TextBlock x:Name="NoProductsText"
+                       Text="No products found"
+                       Padding="12,8"
+                       Foreground="#666666"
+                       IsVisible="False"/>
+          </Grid>
+        </Border>
+      </StackPanel>
+
+      <!-- Selected Product Display -->
+      <StackPanel Grid.Row="2" Spacing="4">
+        <TextBlock Text="Selected Product"/>
+        <TextBox x:Name="SelectedProductBox" 
+                 IsReadOnly="True" 
+                 Background="#F5F5F5"
+                 BorderBrush="#CCCCCC"
+                 BorderThickness="1"/>
+      </StackPanel>
+
+      <!-- Price -->
+      <StackPanel Grid.Row="3" Spacing="4">
+        <TextBlock Text="Price"/>
+        <TextBox x:Name="PriceBox" 
+                 IsReadOnly="True" 
+                 Background="#F5F5F5"
+                 BorderBrush="#CCCCCC"
+                 BorderThickness="1"/>
+      </StackPanel>
+
+      <!-- Available Quantity -->
+      <StackPanel Grid.Row="4" Spacing="4">
+        <TextBlock Text="Available Quantity"/>
+        <TextBox x:Name="AvailableQuantityBox" 
+                 IsReadOnly="True" 
+                 Background="#F5F5F5"
+                 BorderBrush="#CCCCCC"
+                 BorderThickness="1"/>
+      </StackPanel>
+
+      <!-- Quantity to Sell -->
+      <StackPanel Grid.Row="5" Spacing="4">
+        <TextBlock Text="Quantity to Sell"/>
+        <TextBox x:Name="QuantityBox" 
+                 Watermark="Enter quantity"
+                 BorderBrush="#CCCCCC"
+                 BorderThickness="1"/>
+      </StackPanel>
+
+      <!-- Total Price Display -->
+      <StackPanel Grid.Row="6" Spacing="4">
+        <TextBlock Text="Total Price"/>
+        <TextBox x:Name="TotalPriceBox" 
+                 IsReadOnly="True" 
+                 Background="#F5F5F5"
+                 BorderBrush="#CCCCCC"
+                 BorderThickness="1"/>
+      </StackPanel>
+
+      <!-- Buttons -->
+      <StackPanel Grid.Row="8" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Record Sale" Click="OnRecordSale"/>
+        <Button Content="Cancel" Click="OnCancel"/>
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="InventoryApp.Views.InfoDialog"
+        Width="380" Height="180"
+        Title="Message"
+        SystemDecorations="Full"
+        ExtendClientAreaToDecorationsHint="False">
+  <Border Padding="16">
+    <Grid RowDefinitions="*,Auto" RowSpacing="12">
+      <TextBlock x:Name="MessageText" TextWrapping="Wrap"/>
+      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="OK" Click="OnOk"/>
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

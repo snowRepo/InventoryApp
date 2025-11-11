@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="InventoryApp.Views.SettingsView">
+    <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="*">
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="8">
+            <TextBlock Text="Settings" FontSize="24" FontWeight="Bold"/>
+            <Border Height="1" Background="#E0E0E0" Margin="0,0,0,8"/>
+        </StackPanel>
+        
+        <!-- Content will go here -->
+        <StackPanel Grid.Row="2" Spacing="16">
+            <TextBlock Text="Settings content will be added here"
+                     FontSize="16"
+                     Foreground="#666"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

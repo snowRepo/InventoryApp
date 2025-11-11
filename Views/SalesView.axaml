@@ -1,0 +1,126 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InventoryApp.ViewModels"
+             xmlns:conv="using:InventoryApp.Converters"
+             x:Class="InventoryApp.Views.SalesView"
+             x:DataType="vm:SalesViewModel">
+    
+    <UserControl.Resources>
+        <conv:BoolToBrushConverter x:Key="BoolToBrush"/>
+    </UserControl.Resources>
+    
+    <Grid RowDefinitions="Auto,Auto,*,Auto" ColumnDefinitions="*">
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="8">
+            <TextBlock Text="Sales" FontSize="24" FontWeight="Bold"/>
+            <Border Height="1" Background="#E0E0E0" Margin="0,0,0,8"/>
+        </StackPanel>
+
+    <!-- Filters -->
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="8" RowDefinitions="Auto">
+      <TextBox Width="260" 
+               Watermark="Search by Transaction ID or Product" 
+               Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"/>
+      <Grid Grid.Column="1"/>
+      <ComboBox Grid.Column="2" 
+                Width="140"
+                PlaceholderText="Month"
+                x:Name="MonthComboBox"
+                SelectionChanged="OnMonthChanged"/>
+      <ComboBox Grid.Column="3" 
+                Width="100"
+                PlaceholderText="Year"
+                x:Name="YearComboBox"
+                SelectedItem="{Binding SelectedYear}"/>
+      <Button Grid.Column="4" x:Name="NewSaleButton" Content="New Sale" Click="OnNewSale"/>
+    </Grid>
+
+    <!-- Sales table -->
+    <ScrollViewer Grid.Row="2" Margin="0,16,0,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+      <Grid Grid.IsSharedSizeScope="True">
+        <StackPanel>
+          <!-- Header -->
+          <Border Padding="12,10" Background="#F4F4F5" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="*,*,*,*,*,*">
+              <TextBlock Grid.Column="0" Text="Transaction ID" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+              <TextBlock Grid.Column="1" Text="Product Name" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+              <TextBlock Grid.Column="2" Text="Price" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+              <TextBlock Grid.Column="3" Text="Quantity Sold" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+              <TextBlock Grid.Column="4" Text="Total Price" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+              <TextBlock Grid.Column="5" Text="Sale Date" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+            </Grid>
+          </Border>
+          <!-- Rows -->
+          <ItemsControl ItemsSource="{Binding Items}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="12,10" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
+                  <Grid ColumnDefinitions="*,*,*,*,*,*">
+                    <TextBlock Grid.Column="0" 
+                               Text="{Binding TransactionId}" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Margin="0,0,8,0"/>
+                    <TextBlock Grid.Column="1" 
+                               Text="{Binding ProductName}" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Margin="0,0,8,0"/>
+                    <TextBlock Grid.Column="2" 
+                               Text="{Binding Price, StringFormat='{}{0:F2}'}" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+                    <TextBlock Grid.Column="3" 
+                               Text="{Binding QuantitySold}" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+                    <TextBlock Grid.Column="4" 
+                               Text="{Binding TotalPrice, StringFormat='{}{0:F2}'}" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+                    <TextBlock Grid.Column="5" 
+                               Text="{Binding SaleDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Grid>
+    </ScrollViewer>
+
+    <!-- Pager -->
+    <StackPanel Grid.Row="3" 
+                Orientation="Horizontal" 
+                Spacing="8" 
+                HorizontalAlignment="Right" 
+                Margin="0,8,0,0" 
+                VerticalAlignment="Center">
+      <TextBlock Text="Items:" VerticalAlignment="Center"/>
+      <TextBlock Text="{Binding TotalCount}" VerticalAlignment="Center"/>
+      <TextBlock Text="|" Margin="8,0,0,0" VerticalAlignment="Center"/>
+      <TextBlock Text="Page" VerticalAlignment="Center"/>
+      <TextBlock Text="{Binding Page}" VerticalAlignment="Center"/>
+      <TextBlock Text="of" VerticalAlignment="Center"/>
+      <TextBlock Text="{Binding TotalPages}" VerticalAlignment="Center"/>
+      <Button Content="Prev" 
+              Command="{Binding PrevPageCommand}" 
+              Margin="8,0,0,0" 
+              Padding="12,4"/>
+      <Button Content="Next" 
+              Command="{Binding NextPageCommand}" 
+              Margin="4,0,0,0" 
+              Padding="12,4"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

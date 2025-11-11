@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:InventoryApp.ViewModels"
+        x:Class="InventoryApp.Views.RegisterWindow"
+        Width="420" Height="420"
+        Title="Create account">
+  <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*">
+    <TextBlock Margin="12" FontSize="18" Text="Create an account"/>
+
+    <StackPanel Grid.Row="1" Margin="20" Spacing="8" x:DataType="vm:RegisterViewModel">
+      <TextBlock Text="Username"/>
+      <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+
+      <TextBlock Text="Password" Margin="0,8,0,0"/>
+      <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChar="•"/>
+
+      <TextBlock Text="Confirm password" Margin="0,8,0,0"/>
+      <TextBox Text="{Binding ConfirmPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChar="•"/>
+
+      <TextBlock Foreground="Red" TextWrapping="Wrap" Text="{Binding Error}"/>
+
+      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+        <Button Content="Register" Command="{Binding RegisterCommand}"/>
+        <Button Content="Cancel" Command="{Binding CancelCommand}"/>
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock Grid.Row="2" Margin="12" Opacity="0.6" FontSize="12" Text="InventoryApp"/>
+  </Grid>
+</Window>

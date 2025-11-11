@@ -1,0 +1,21 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="InventoryApp.App"
+             xmlns:local="using:InventoryApp"
+             xmlns:vm="using:InventoryApp.ViewModels"
+             xmlns:views="using:InventoryApp.Views"
+             RequestedThemeVariant="Light">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+        <!-- Put explicit mapping first so it has priority over the generic locator -->
+        <DataTemplate DataType="vm:ProductsViewModel" x:DataType="vm:ProductsViewModel">
+            <views:ProductsView/>
+        </DataTemplate>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+</Application>
