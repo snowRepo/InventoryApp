@@ -78,7 +78,11 @@ public partial class ProductsView : UserControl
         var dlg = new AddProductWindow();
         // Prefill existing values
         dlg.FindControl<TextBox>("NameBox")!.Text = product.Name;
-        dlg.FindControl<TextBox>("CategoryBox")!.Text = product.Category;
+        var categoryBox = dlg.FindControl<ComboBox>("CategoryBox");
+        if (categoryBox != null)
+        {
+            categoryBox.SelectedItem = product.Category;
+        }
         dlg.FindControl<TextBox>("PriceBox")!.Text = product.UnitPrice.ToString();
         dlg.FindControl<TextBox>("QuantityBox")!.Text = product.Quantity.ToString();
         dlg.FindControl<TextBox>("SkuBox")!.Text = product.Sku; // keep existing SKU
