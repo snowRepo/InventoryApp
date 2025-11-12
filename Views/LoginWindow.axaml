@@ -14,7 +14,10 @@
       <TextBlock Text="Password" Margin="0,8,0,0"/>
       <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChar="•"/>
 
-      <TextBlock Foreground="Red" TextWrapping="Wrap" Text="{Binding Error}"/>
+      <TextBlock TextWrapping="Wrap" Text="{Binding Error}" 
+                 Foreground="{Binding IsSuccessMessage, 
+                                   Converter={StaticResource BoolToBrushConverter}, 
+                                   ConverterParameter='Green|Red'}" />
 
       <Button Content="Forgot password?" Command="{Binding ForgotPasswordCommand}" HorizontalAlignment="Left" Classes="accent"/> 
 

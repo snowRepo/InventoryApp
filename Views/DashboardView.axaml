@@ -26,19 +26,19 @@
       <Border Grid.Column="1" Background="#FFFFFF" CornerRadius="6" Padding="12" BorderBrush="#E1E6EF" BorderThickness="1" >
         <StackPanel>
           <TextBlock Text="Sales today" Opacity="0.7"/>
-          <TextBlock Text="{Binding SalesToday}" FontSize="24" FontWeight="Bold"/>
+          <TextBlock Text="{Binding FormattedSalesToday}" FontSize="24" FontWeight="Bold"/>
         </StackPanel>
       </Border>
       <Border Grid.Column="2" Background="#FFFFFF" CornerRadius="6" Padding="12" BorderBrush="#E1E6EF" BorderThickness="1" >
         <StackPanel>
           <TextBlock Text="All-time sales" Opacity="0.7"/>
-          <TextBlock Text="{Binding SalesAllTime}" FontSize="24" FontWeight="Bold"/>
+          <TextBlock Text="{Binding FormattedSalesAllTime}" FontSize="24" FontWeight="Bold"/>
         </StackPanel>
       </Border>
       <Border Grid.Column="3" Background="#FFFFFF" CornerRadius="6" Padding="12" BorderBrush="#E1E6EF" BorderThickness="1" >
         <StackPanel>
           <TextBlock Text="Inventory value" Opacity="0.7"/>
-          <TextBlock Text="{Binding InventoryValue}" FontSize="24" FontWeight="Bold"/>
+          <TextBlock Text="{Binding FormattedInventoryValue}" FontSize="24" FontWeight="Bold"/>
         </StackPanel>
       </Border>
     </Grid>
@@ -55,9 +55,9 @@
           <DataTemplate x:DataType="vm:LowStockItem">
             <Border Background="#FFFFFF" CornerRadius="6" Padding="10" BorderBrush="#E1E6EF" BorderThickness="1" Margin="0,4,0,0">
               <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
-                <TextBlock Text="{Binding Name}"/>
-                <TextBlock Grid.Column="1" Text="{Binding UnitPrice}"/>
-                <TextBlock Grid.Column="2" Text="{Binding Quantity}"/>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding FormattedUnitPrice}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding Quantity, StringFormat='{}{0} left'}" VerticalAlignment="Center"/>
               </Grid>
             </Border>
           </DataTemplate>

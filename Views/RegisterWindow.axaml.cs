@@ -17,7 +17,10 @@ public partial class RegisterWindow : Window
         _auth = auth;
         InitializeComponent();
 
-        var vm = new RegisterViewModel(_auth);
+        // Resolve UserSettingsService
+        var settingsService = App.Resolver.Resolve<UserSettingsService>();
+        
+        var vm = new RegisterViewModel(_auth, settingsService);
         vm.RequestMasterPin += OnRequestMasterPinAsync;
         vm.RegistrationCompleted += OnRegistrationCompleted;
         vm.RegistrationCanceled += OnRegistrationCanceled;

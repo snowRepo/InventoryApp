@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="InventoryApp.Views.AddProductWindow"
         Width="420" Height="380"
-        Title="Add Product"
+        Title="Product"
         SystemDecorations="Full"
         ExtendClientAreaToDecorationsHint="False">
   <Border Padding="16">
@@ -12,7 +12,9 @@
 
       <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="120,*" RowSpacing="10" ColumnSpacing="8">
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="0" Grid.Column="1" x:Name="NameBox" TextChanged="OnInputChanged"/>
+        <TextBox Grid.Row="0" Grid.Column="1" x:Name="NameBox" 
+                 TextChanged="OnInputChanged"
+                 HorizontalContentAlignment="Left"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Category" VerticalAlignment="Center"/>
         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CategoryBox" 
@@ -26,18 +28,24 @@
                  MinWidth="200"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Price" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="2" Grid.Column="1" x:Name="PriceBox"/>
+        <TextBox Grid.Row="2" Grid.Column="1" 
+                 x:Name="PriceBox"
+                 HorizontalContentAlignment="Left"
+                 TextChanged="OnPriceChanged"/>
 
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Quantity" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="3" Grid.Column="1" x:Name="QuantityBox"/>
+        <TextBox Grid.Row="3" Grid.Column="1" x:Name="QuantityBox"
+                 HorizontalContentAlignment="Left"/>
 
         <TextBlock Grid.Row="4" Grid.Column="0" Text="SKU" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="4" Grid.Column="1" x:Name="SkuBox" IsReadOnly="True"/>
+        <TextBox Grid.Row="4" Grid.Column="1" x:Name="SkuBox" 
+                 IsReadOnly="True"
+                 HorizontalContentAlignment="Left"/>
       </Grid>
 
       <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
         <Button Content="Cancel" Click="OnCancel"/>
-        <Button Content="Add" Click="OnAdd"/>
+        <Button x:Name="AddButton" Content="Add" Click="OnAdd"/>
       </StackPanel>
     </Grid>
   </Border>

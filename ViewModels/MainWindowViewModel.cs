@@ -2,6 +2,8 @@ namespace InventoryApp.ViewModels;
 
 using CommunityToolkit.Mvvm.Input;
 using System;
+using Avalonia.Controls;
+using InventoryApp.Services;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
@@ -29,49 +31,59 @@ public partial class MainWindowViewModel : ViewModelBase
     public event Action? LogoutRequested;
     
     [RelayCommand]
-    private void Logout()
+    public void Logout()
     {
         LogoutRequested?.Invoke();
     }
 
-    public MainWindowViewModel()
+    private Window? _window;
+
+    private readonly UserSettingsService _settingsService;
+
+    private readonly IAuthService _authService;
+
+    public MainWindowViewModel() : this(string.Empty) { }
+
+    public MainWindowViewModel(string username, Window? window = null)
     {
-        _username = string.Empty;
+        _window = window;
+        _username = username;
+        
+        // Get services
+        _settingsService = App.Resolver.Resolve<UserSettingsService>();
+        _authService = App.Resolver.Resolve<IAuthService>();
+        
+        // Initialize commands
         ShowDashboardCommand = new RelayCommand(ActivateDashboard);
         ShowProductsCommand = new RelayCommand(ActivateProducts);
         ShowSalesCommand = new RelayCommand(ActivateSales);
         ShowExternalSurfacesCommand = new RelayCommand(ActivateExternalSurfaces);
         ShowSettingsCommand = new RelayCommand(ActivateSettings);
 
-        DashboardVM = new DashboardViewModel(_username);
-        ProductsVM = new ProductsViewModel();
-        SalesVM = new SalesViewModel();
+        // Initialize view models with required services
+        DashboardVM = new DashboardViewModel(_username, _settingsService);
+        ProductsVM = new ProductsViewModel(_settingsService);
+        SalesVM = new SalesViewModel(_settingsService);
         
-        // Use the service locator to resolve ExternalSurfacesViewModel with its dependencies
+        // Subscribe to product updates to refresh dashboard
+        ProductsVM.ProductsUpdated += (s, e) => DashboardVM.Refresh();
+        
+        // Use the service locator to resolve ViewModels with their dependencies
         ExternalSurfacesVM = App.Resolver.Resolve<ExternalSurfacesViewModel>();
-        SettingsVM = new SettingsViewModel();
+        SettingsVM = new SettingsViewModel(_window, _settingsService, _username, _authService);
         
         ActivateDashboard();
     }
-
-    public MainWindowViewModel(string username)
+    
+    // Method to set the window reference after construction if needed
+    public void SetWindow(Window window)
     {
-        _username = username;
-        ShowDashboardCommand = new RelayCommand(ActivateDashboard);
-        ShowProductsCommand = new RelayCommand(ActivateProducts);
-        ShowSalesCommand = new RelayCommand(ActivateSales);
-        ShowExternalSurfacesCommand = new RelayCommand(ActivateExternalSurfaces);
-        ShowSettingsCommand = new RelayCommand(ActivateSettings);
-
-        DashboardVM = new DashboardViewModel(_username);
-        ProductsVM = new ProductsViewModel();
-        SalesVM = new SalesViewModel();
-        
-        // Use the service locator to resolve ExternalSurfacesViewModel with its dependencies
-        ExternalSurfacesVM = App.Resolver.Resolve<ExternalSurfacesViewModel>();
-        SettingsVM = new SettingsViewModel();
-        
-        ActivateDashboard();
+        _window = window;
+        // Reinitialize SettingsViewModel with the window reference and existing services
+        if (SettingsVM != null)
+        {
+            SettingsVM = new SettingsViewModel(_window, _settingsService, _username, _authService);
+        }
     }
     
     private void ActivateDashboard()

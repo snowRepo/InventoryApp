@@ -19,6 +19,9 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty]
     private string _error = string.Empty;
 
+    [ObservableProperty]
+    private bool _isSuccessMessage = false;
+
     public event Action<string>? LoginSucceeded;
     public event Action? ShowRegisterRequested;
     public event Action? ShowForgotPasswordRequested;
@@ -44,12 +47,16 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     private void NavigateToRegister()
     {
+        Error = string.Empty;
+        IsSuccessMessage = false;
         ShowRegisterRequested?.Invoke();
     }
 
     [RelayCommand]
     private void ForgotPassword()
     {
+        Error = string.Empty;
+        IsSuccessMessage = false;
         ShowForgotPasswordRequested?.Invoke();
     }
 }

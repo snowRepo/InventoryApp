@@ -4,6 +4,7 @@
              xmlns:local="using:InventoryApp"
              xmlns:vm="using:InventoryApp.ViewModels"
              xmlns:views="using:InventoryApp.Views"
+             xmlns:converters="using:InventoryApp.Converters"
              RequestedThemeVariant="Light">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -15,7 +16,12 @@
         <local:ViewLocator/>
     </Application.DataTemplates>
   
-    <Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
+        <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <FluentTheme />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

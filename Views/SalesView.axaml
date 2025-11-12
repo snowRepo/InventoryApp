@@ -71,7 +71,7 @@
                                TextWrapping="Wrap"
                                Margin="0,0,8,0"/>
                     <TextBlock Grid.Column="2" 
-                               Text="{Binding Price, StringFormat='{}{0:F2}'}" 
+                               Text="{Binding FormattedPrice}" 
                                VerticalAlignment="Center" 
                                HorizontalAlignment="Center"
                                TextAlignment="Center"/>
@@ -81,12 +81,13 @@
                                HorizontalAlignment="Center"
                                TextAlignment="Center"/>
                     <TextBlock Grid.Column="4" 
-                               Text="{Binding TotalPrice, StringFormat='{}{0:F2}'}" 
+                               Text="{Binding FormattedTotalPrice}" 
                                VerticalAlignment="Center" 
                                HorizontalAlignment="Center"
-                               TextAlignment="Center"/>
+                               TextAlignment="Center"
+                               FontWeight="SemiBold"/>
                     <TextBlock Grid.Column="5" 
-                               Text="{Binding SaleDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" 
+                               Text="{Binding FormattedSaleDate}" 
                                VerticalAlignment="Center" 
                                HorizontalAlignment="Center"
                                TextAlignment="Center"/>

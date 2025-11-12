@@ -2,16 +2,20 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InventoryApp.Data;
 using InventoryApp.Models;
+using InventoryApp.Services;
+using InventoryApp.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryApp.ViewModels;
 
-public partial class SalesViewModel : ViewModelBase
+public partial class SalesViewModel : ViewModelBase, IDisposable
 {
+    private readonly UserSettingsService _settingsService;
     [ObservableProperty]
     private string _search = string.Empty;
 
@@ -36,13 +40,25 @@ public partial class SalesViewModel : ViewModelBase
     [ObservableProperty]
     private bool _noResults;
 
-    public ObservableCollection<Sale> Items { get; } = new();
+    public ObservableCollection<SaleViewModel> Items { get; } = new();
 
     public int TotalPages => TotalCount == 0 ? 1 : (TotalCount + PageSize - 1) / PageSize;
 
-    public SalesViewModel()
+    public SalesViewModel(UserSettingsService settingsService = null)
+    {
+        _settingsService = settingsService ?? App.Resolver.Resolve<UserSettingsService>();
+        _settingsService.SettingsChanged += OnSettingsChanged;
+        _ = ReloadAsync();
+    }
+
+    private void OnSettingsChanged(object sender, EventArgs e)
     {
         _ = ReloadAsync();
+    }
+
+    public void Dispose()
+    {
+        _settingsService.SettingsChanged -= OnSettingsChanged;
     }
 
     partial void OnSearchChanged(string value)
@@ -126,6 +142,7 @@ public partial class SalesViewModel : ViewModelBase
         // Paginate and order by date descending (newest first)
         var items = await query
             .OrderByDescending(s => s.SaleDate)
+            .ThenByDescending(s => s.Id)
             .Skip((Page - 1) * PageSize)
             .Take(PageSize)
             .ToListAsync();
@@ -133,7 +150,7 @@ public partial class SalesViewModel : ViewModelBase
         Items.Clear();
         foreach (var item in items)
         {
-            Items.Add(item);
+            Items.Add(new SaleViewModel(item, _settingsService));
         }
 
         HasResults = Items.Count > 0;

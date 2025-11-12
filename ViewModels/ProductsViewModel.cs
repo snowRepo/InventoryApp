@@ -7,12 +7,18 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel;
+using InventoryApp.Services;
+using InventoryApp.Helpers;
 
 namespace InventoryApp.ViewModels;
 
-public partial class ProductsViewModel : ViewModelBase
+public partial class ProductsViewModel : ViewModelBase, IDisposable
 {
-    public ObservableCollection<Product> Items { get; } = new();
+    // Event to notify when products are updated (added, edited, or deleted)
+    public event EventHandler ProductsUpdated;
+    private readonly UserSettingsService _settingsService;
+    public ObservableCollection<ProductViewModel> Items { get; } = new();
 
     [ObservableProperty]
     private string _search = string.Empty;
@@ -43,10 +49,22 @@ public partial class ProductsViewModel : ViewModelBase
     public bool HasResults { get; private set; }
     public bool NoResults => !HasResults;
 
-    public ProductsViewModel()
+    public ProductsViewModel(UserSettingsService settingsService = null)
     {
+        _settingsService = settingsService ?? App.Resolver.Resolve<UserSettingsService>();
+        _settingsService.SettingsChanged += OnSettingsChanged;
         SortIndex = 0; // default A - Z
         _ = RefreshAsync();
+    }
+
+    private void OnSettingsChanged(object sender, EventArgs e)
+    {
+        _ = RefreshAsync();
+    }
+
+    public void Dispose()
+    {
+        _settingsService.SettingsChanged -= OnSettingsChanged;
     }
 
     public async Task ReloadAsync()
@@ -66,7 +84,7 @@ public partial class ProductsViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task RefreshAsync()
+    public async Task RefreshAsync()
     {
         using var db = new AppDbContext();
         var q = db.Products.AsNoTracking().AsQueryable();
@@ -106,7 +124,7 @@ public partial class ProductsViewModel : ViewModelBase
 
         Items.Clear();
         foreach (var it in pageItems)
-            Items.Add(it);
+            Items.Add(new ProductViewModel(it, _settingsService));
 
         OnPropertyChanged(nameof(TotalCount));
         HasResults = TotalCount > 0;

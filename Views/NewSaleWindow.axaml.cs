@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using InventoryApp.Data;
 using InventoryApp.Models;
 using Microsoft.EntityFrameworkCore;
+using InventoryApp.Services;
 
 namespace InventoryApp.Views;
 
@@ -16,10 +17,30 @@ public partial class NewSaleWindow : Window
 
     public record NewSaleResult(int ProductId, string ProductName, decimal Price, int QuantitySold);
 
+    public string CurrencySymbol { get; }
+
     public NewSaleWindow()
     {
         InitializeComponent();
         this.FindControl<TextBox>("QuantityBox")!.TextChanged += OnQuantityChanged;
+        
+        // Set up data context
+        this.DataContext = this;
+        
+        // Get the current currency settings
+        var settingsService = App.Resolver.Resolve<UserSettingsService>();
+        
+        // Only set currency symbol if it's not the default (empty)
+        if (!string.IsNullOrEmpty(settingsService.CurrentSettings.CurrencySymbol) && 
+            settingsService.CurrentSettings.CurrencySymbol != "$")
+        {
+            CurrencySymbol = settingsService.CurrentSettings.CurrencySymbol;
+        }
+        else
+        {
+            // Default to empty string if no currency is set
+            CurrencySymbol = string.Empty;
+        }
     }
 
     public new Task<NewSaleResult?> ShowDialog(Window owner)
@@ -71,6 +92,28 @@ public partial class NewSaleWindow : Window
         }
     }
 
+    private void UpdatePriceBox(decimal price)
+    {
+        var priceBox = this.FindControl<TextBox>("PriceBox");
+        if (priceBox != null)
+        {
+            priceBox.Text = string.IsNullOrEmpty(CurrencySymbol) 
+                ? $"{price:F2}" 
+                : $"{CurrencySymbol} {price:F2}";
+        }
+    }
+
+    private void UpdateTotalPriceBox(decimal total)
+    {
+        var totalPriceBox = this.FindControl<TextBox>("TotalPriceBox");
+        if (totalPriceBox != null)
+        {
+            totalPriceBox.Text = string.IsNullOrEmpty(CurrencySymbol)
+                ? $"{total:F2}"
+                : $"{CurrencySymbol} {total:F2}";
+        }
+    }
+
     private async void OnProductSelected(object? sender, SelectionChangedEventArgs e)
     {
         var resultsList = sender as ListBox;
@@ -85,9 +128,9 @@ public partial class NewSaleWindow : Window
         if (_selectedProduct != null)
         {
             this.FindControl<TextBox>("SelectedProductBox")!.Text = _selectedProduct.Name;
-            this.FindControl<TextBox>("PriceBox")!.Text = _selectedProduct.UnitPrice.ToString("F2");
+            UpdatePriceBox(_selectedProduct.UnitPrice);
             this.FindControl<TextBox>("AvailableQuantityBox")!.Text = _selectedProduct.Quantity.ToString();
-            this.FindControl<TextBox>("TotalPriceBox")!.Text = "0.00";
+            UpdateTotalPriceBox(0);
             this.FindControl<TextBox>("QuantityBox")!.Text = string.Empty;
         }
 
@@ -100,66 +143,51 @@ public partial class NewSaleWindow : Window
         if (_selectedProduct is null) return;
 
         var quantityBox = sender as TextBox;
-        if (quantityBox is null) return;
+        if (quantityBox is null || !int.TryParse(quantityBox.Text, out int quantity) || quantity <= 0)
+        {
+            UpdateTotalPriceBox(0);
+            return;
+        }
 
-        if (int.TryParse(quantityBox.Text, out int qty) && qty > 0)
-        {
-            var total = _selectedProduct.UnitPrice * qty;
-            this.FindControl<TextBox>("TotalPriceBox")!.Text = total.ToString("F2");
-        }
-        else
-        {
-            this.FindControl<TextBox>("TotalPriceBox")!.Text = "0.00";
-        }
+        var total = _selectedProduct.UnitPrice * quantity;
+        UpdateTotalPriceBox(total);
     }
 
     private async void OnRecordSale(object? sender, RoutedEventArgs e)
     {
-        Console.WriteLine("OnRecordSale called");
-        
         if (_selectedProduct is null)
         {
-            Console.WriteLine("ERROR: No product selected");
-            await ShowErrorAsync("Please select a product first.");
+            await ShowError("Please select a product");
             return;
         }
 
-        Console.WriteLine($"Selected product: {_selectedProduct.Name} (ID: {_selectedProduct.Id})");
-
-        var quantityText = this.FindControl<TextBox>("QuantityBox")!.Text;
-        Console.WriteLine($"Quantity text: '{quantityText}'");
-        
-        if (!int.TryParse(quantityText, out int quantity) || quantity <= 0)
+        var quantityBox = this.FindControl<TextBox>("QuantityBox")!;
+        if (!int.TryParse(quantityBox.Text, out int quantity) || quantity <= 0)
         {
-            Console.WriteLine($"ERROR: Invalid quantity: '{quantityText}'");
-            await ShowErrorAsync("Please enter a valid quantity.");
+            await ShowError("Please enter a valid quantity");
             return;
         }
-
-        Console.WriteLine($"Parsed quantity: {quantity}, Available: {_selectedProduct.Quantity}");
 
         if (quantity > _selectedProduct.Quantity)
         {
-            Console.WriteLine($"ERROR: Quantity {quantity} exceeds available {_selectedProduct.Quantity}");
-            await ShowErrorAsync($"Quantity exceeds available stock. Available: {_selectedProduct.Quantity}");
+            await ShowError($"Not enough stock. Only {_selectedProduct.Quantity} available");
             return;
         }
 
-        Console.WriteLine("Creating NewSaleResult...");
-        var result = new NewSaleResult(
+        _tcs?.SetResult(new NewSaleResult(
             _selectedProduct.Id,
             _selectedProduct.Name,
             _selectedProduct.UnitPrice,
             quantity
-        );
+        ));
 
-        Console.WriteLine($"Setting result and closing dialog: ProductId={result.ProductId}, Product={result.ProductName}, Qty={result.QuantitySold}");
-        _tcs?.TrySetResult(result);
         Close();
     }
 
-    private async Task ShowErrorAsync(string message)
+    private async Task ShowError(string message)
     {
+        var dialog = new InfoDialog();
+        await dialog.ShowAsync(this, message);
         var owner = this.Owner as Window;
         if (owner is null) return;
         

@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using InventoryApp.Data;
+using InventoryApp.Models;
+using InventoryApp.Services;
 
 namespace InventoryApp.Views;
 
@@ -43,8 +47,12 @@ public partial class AddProductWindow : Window, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    public string CurrencySymbol { get; }
+    
     public AddProductWindow()
     {
+        var settingsService = App.Resolver.Resolve<UserSettingsService>();
+        CurrencySymbol = settingsService.CurrentSettings.CurrencySymbol;
         InitializeComponent();
         LoadCategories();
         
@@ -119,51 +127,138 @@ public partial class AddProductWindow : Window, INotifyPropertyChanged
         GenerateSku();
     }
 
-    private void OnAdd(object? sender, RoutedEventArgs e)
+    private void OnPriceChanged(object? sender, TextChangedEventArgs e)
     {
-        var nameBox = this.FindControl<TextBox>("NameBox");
-        var categoryBox = this.FindControl<ComboBox>("CategoryBox");
-        var priceBox = this.FindControl<TextBox>("PriceBox");
-        var quantityBox = this.FindControl<TextBox>("QuantityBox");
-        var skuBox = this.FindControl<TextBox>("SkuBox");
-
-        var name = nameBox?.Text?.Trim() ?? string.Empty;
-        var category = categoryBox?.Text?.Trim() ?? string.Empty;
-        var priceText = priceBox?.Text ?? string.Empty;
-        var qtyText = quantityBox?.Text ?? string.Empty;
-        var skuText = skuBox?.Text ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(name)) { return; }
-        if (string.IsNullOrWhiteSpace(category)) { return; }
-        if (!decimal.TryParse(priceText, out var price)) { return; }
-        if (!int.TryParse(qtyText, out var qty)) { return; }
-
-        if (string.IsNullOrWhiteSpace(skuText))
+        if (sender is not TextBox textBox) return;
+        
+        // Don't process if this change was triggered by our own code
+        if (textBox.Tag as string == "processing") return;
+        
+        try
         {
-            // Generate SKU if still empty and inputs are valid (max 5, alnum)
-            string Filter(string s)
+            // Mark that we're processing to prevent recursive calls
+            textBox.Tag = "processing";
+            
+            var text = textBox.Text ?? string.Empty;
+            
+            // Remove any existing currency symbol to prevent duplication
+            text = text.Replace(CurrencySymbol, "").Trim();
+            
+            // If the text is empty, just clear and return
+            if (string.IsNullOrEmpty(text))
             {
-                var chars = new System.Text.StringBuilder();
-                foreach (var ch in s.ToUpperInvariant())
-                {
-                    if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')) chars.Append(ch);
-                }
-                return chars.ToString();
+                textBox.Text = string.Empty;
+                return;
             }
-            var combined = Filter(category + name);
-            skuText = combined.Length > 5 ? combined.Substring(0, 5) : combined;
+            
+            // Add the currency symbol at the start of the text
+            var newText = $"{CurrencySymbol} {text.Trim()}";
+            
+            // Only update if the text has actually changed to prevent cursor jumping
+            if (textBox.Text != newText)
+            {
+                // Save the cursor position
+                var cursorPos = textBox.CaretIndex;
+                
+                // Update the text with the currency symbol
+                textBox.Text = newText;
+                
+                // Restore the cursor position, adjusting for the added currency symbol
+                textBox.CaretIndex = Math.Min(cursorPos + CurrencySymbol.Length + 1, textBox.Text?.Length ?? 0);
+            }
         }
-
-        var result = new AddProductResult
+        finally
         {
-            Name = name.Trim(),
-            Category = category.Trim(),
-            UnitPrice = price,
-            Quantity = Math.Max(0, qty),
-            Sku = skuText.Trim(),
-        };
+            // Clear the processing flag
+            textBox.Tag = null;
+        }
+    }
 
-        Close(result);
+    private async void OnAdd(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var nameBox = this.FindControl<TextBox>("NameBox");
+            var categoryBox = this.FindControl<ComboBox>("CategoryBox");
+            var priceBox = this.FindControl<TextBox>("PriceBox");
+            var quantityBox = this.FindControl<TextBox>("QuantityBox");
+            var skuBox = this.FindControl<TextBox>("SkuBox");
+
+            var name = nameBox?.Text?.Trim() ?? string.Empty;
+            var category = categoryBox?.Text?.Trim() ?? string.Empty;
+            var priceText = priceBox?.Text?.Replace(CurrencySymbol, "").Trim() ?? string.Empty;
+            var qtyText = quantityBox?.Text?.Trim() ?? string.Empty;
+            var skuText = skuBox?.Text?.Trim() ?? string.Empty;
+
+            // Input validation
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                await ShowError("Please enter a product name");
+                nameBox?.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                await ShowError("Please select or enter a category");
+                categoryBox?.Focus();
+                return;
+            }
+
+            if (!decimal.TryParse(priceText, System.Globalization.NumberStyles.Currency | System.Globalization.NumberStyles.AllowDecimalPoint, 
+                               System.Globalization.CultureInfo.InvariantCulture, out var price) || price <= 0)
+            {
+                await ShowError("Please enter a valid price");
+                priceBox?.SelectAll();
+                priceBox?.Focus();
+                return;
+            }
+
+            if (!int.TryParse(qtyText, out var qty) || qty < 0)
+            {
+                await ShowError("Please enter a valid quantity");
+                quantityBox?.SelectAll();
+                quantityBox?.Focus();
+                return;
+            }
+
+            // Generate SKU if empty
+            if (string.IsNullOrWhiteSpace(skuText))
+            {
+                string Filter(string s)
+                {
+                    var chars = new System.Text.StringBuilder();
+                    foreach (var ch in s.ToUpperInvariant())
+                    {
+                        if (char.IsLetterOrDigit(ch)) chars.Append(ch);
+                    }
+                    return chars.ToString();
+                }
+                var combined = Filter(category + name);
+                skuText = combined.Length > 5 ? combined[..5] : combined;
+            }
+
+            var result = new AddProductResult
+            {
+                Name = name,
+                Category = category,
+                UnitPrice = Math.Round(price, 2), // Ensure we only keep 2 decimal places
+                Quantity = Math.Max(0, qty),
+                Sku = skuText
+            };
+
+            Close(result);
+        }
+        catch (Exception ex)
+        {
+            await ShowError($"An error occurred: {ex.Message}");
+        }
+    }
+
+    private async Task ShowError(string message)
+    {
+        var dialog = new InfoDialog();
+        await dialog.ShowAsync(this, $"Error: {message}");
     }
 
     public class AddProductResult

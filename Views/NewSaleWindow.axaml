@@ -1,6 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="InventoryApp.Views.NewSaleWindow"
+        x:DataType="views:NewSaleWindow"
+        xmlns:views="using:InventoryApp.Views"
         Width="500" Height="550"
         Title="New Sale"
         SystemDecorations="Full"
@@ -53,7 +55,8 @@
                  IsReadOnly="True" 
                  Background="#F5F5F5"
                  BorderBrush="#CCCCCC"
-                 BorderThickness="1"/>
+                 BorderThickness="1"
+                 HorizontalContentAlignment="Left"/>
       </StackPanel>
 
       <!-- Available Quantity -->
@@ -82,7 +85,8 @@
                  IsReadOnly="True" 
                  Background="#F5F5F5"
                  BorderBrush="#CCCCCC"
-                 BorderThickness="1"/>
+                 BorderThickness="1"
+                 HorizontalContentAlignment="Left"/>
       </StackPanel>
 
       <!-- Buttons -->

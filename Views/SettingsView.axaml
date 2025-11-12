@@ -2,9 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:InventoryApp.ViewModels"
              mc:Ignorable="d"
              d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="InventoryApp.Views.SettingsView">
+             x:Class="InventoryApp.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
     <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="*">
         <!-- Header -->
         <StackPanel Grid.Row="0" Spacing="8">
@@ -12,11 +14,114 @@
             <Border Height="1" Background="#E0E0E0" Margin="0,0,0,8"/>
         </StackPanel>
         
-        <!-- Content will go here -->
-        <StackPanel Grid.Row="2" Spacing="16">
-            <TextBlock Text="Settings content will be added here"
-                     FontSize="16"
-                     Foreground="#666"/>
-        </StackPanel>
+        <!-- Settings Content -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="24" Margin="0,0,16,24">
+                <!-- Language Section -->
+                <Border BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="0,0,0,16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Language" FontWeight="Bold" FontSize="16"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Language" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="1" 
+                                     Text="English" 
+                                     IsReadOnly="True" 
+                                     Width="200"
+                                     HorizontalAlignment="Left"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Currency Section -->
+                <Border BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="0,0,0,16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Currency" FontWeight="Bold" FontSize="16"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Select Currency" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" 
+                                      ItemsSource="{Binding AvailableCurrencies}"
+                                      SelectedItem="{Binding SelectedCurrency}"
+                                      Width="200"
+                                      HorizontalAlignment="Left"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Save Button -->
+                <Button Content="Save Settings" 
+                        Command="{Binding SaveSettingsCommand}"
+                        HorizontalAlignment="Right"
+                        Margin="0,20,0,0"
+                        Padding="24,8"
+                        Background="#4CAF50"
+                        Foreground="White">
+                    <Button.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Style.Animations>
+                                <Animation Duration="0:0:0.2">
+                                    <KeyFrame Cue="0%">
+                                        <Setter Property="Background" Value="#4CAF50"/>
+                                    </KeyFrame>
+                                    <KeyFrame Cue="100%">
+                                        <Setter Property="Background" Value="#388E3C"/>
+                                    </KeyFrame>
+                                </Animation>
+                            </Style.Animations>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+                <!-- Account Section -->
+                <Border BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="0,0,0,16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Account" FontWeight="Bold" FontSize="16"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Content="Delete Account" 
+                                    HorizontalAlignment="Left"
+                                    Background="#FF3B30" 
+                                    Foreground="White" 
+                                    BorderThickness="0"
+                                    Padding="24,8"
+                                    Cursor="Hand"
+                                    Command="{Binding DeleteAccountCommand}">
+                                <Button.Styles>
+                                    <Style Selector="Button">
+                                        <Setter Property="Background" Value="#FF3B30"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                        <Style.Animations>
+                                            <Animation Duration="0:0:0.2">
+                                                <KeyFrame Cue="0%">
+                                                    <Setter Property="Background" Value="#FF3B30"/>
+                                                </KeyFrame>
+                                                <KeyFrame Cue="100%">
+                                                    <Setter Property="Background" Value="#D32F2F"/>
+                                                </KeyFrame>
+                                            </Animation>
+                                        </Style.Animations>
+                                    </Style>
+                                </Button.Styles>
+                            </Button>
+                        </Grid>
+                        <TextBlock Text="Warning: This action cannot be undone. All your data will be permanently deleted."
+                                 FontSize="12"
+                                 Foreground="#FF3B30"
+                                 Margin="200,0,0,0"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

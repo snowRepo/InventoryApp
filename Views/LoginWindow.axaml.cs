@@ -1,4 +1,6 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using InventoryApp.ViewModels;
 using InventoryApp.Services;
 using System;
@@ -33,22 +35,40 @@ public partial class LoginWindow : Window
         if (DataContext is LoginViewModel vm && result == true)
         {
             vm.Error = "Account created successfully. Please login.";
+            vm.IsSuccessMessage = true;
         }
     }
 
     private void OnLoginSucceeded(string username)
     {
-        var mainVm = new MainWindowViewModel(username);
-        var main = new MainWindow
+        var main = new MainWindow();
+        
+        // Resolve required services
+        var settingsService = App.Resolver.Resolve<UserSettingsService>();
+        var authService = App.Resolver.Resolve<IAuthService>();
+        
+        // Create main view model with required services
+        var mainVm = new MainWindowViewModel(username, main);
+        main.DataContext = mainVm;
+        
+        // Set the window reference after creation
+        mainVm.SetWindow(main);
+
+        // Set the main window in the application lifetime
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            DataContext = mainVm
-        };
+            desktop.MainWindow = main;
+        }
 
         mainVm.LogoutRequested += () =>
         {
-            var login = new LoginWindow(_auth);
-            login.Show();
-            main.Close();
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+            {
+                var login = new LoginWindow(_auth);
+                desktopLifetime.MainWindow = login;
+                login.Show();
+                main.Close();
+            }
         };
 
         main.Show();

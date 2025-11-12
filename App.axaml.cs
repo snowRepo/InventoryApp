@@ -154,9 +154,12 @@ public partial class App : Application
     {
         // Register services
         services.AddSingleton<IDeviceService, MockDeviceService>();
+        services.AddSingleton<UserSettingsService>();
+        services.AddSingleton<IAuthService, AuthService>();
         
         // Register ViewModels
         services.AddTransient<ExternalSurfacesViewModel>();
+        services.AddTransient<SettingsViewModel>();
         
         // Register other services as needed
     }

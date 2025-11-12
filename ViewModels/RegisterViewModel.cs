@@ -9,6 +9,7 @@ namespace InventoryApp.ViewModels;
 public partial class RegisterViewModel : ObservableObject
 {
     private readonly IAuthService _auth;
+    private readonly UserSettingsService _settingsService;
 
     [ObservableProperty]
     private string _username = string.Empty;
@@ -26,9 +27,10 @@ public partial class RegisterViewModel : ObservableObject
     public event Action? RegistrationCompleted; // success -> back to login
     public event Action? RegistrationCanceled; // canceled -> back to login
 
-    public RegisterViewModel(IAuthService auth)
+    public RegisterViewModel(IAuthService auth, UserSettingsService settingsService = null)
     {
         _auth = auth;
+        _settingsService = settingsService ?? App.Resolver.Resolve<UserSettingsService>();
     }
 
     [RelayCommand]
@@ -53,6 +55,8 @@ public partial class RegisterViewModel : ObservableObject
             Error = err ?? "Registration failed";
             return;
         }
+        // Reset currency settings to default for new account
+        _settingsService.UpdateCurrency("USD");
         RegistrationCompleted?.Invoke();
     }
 

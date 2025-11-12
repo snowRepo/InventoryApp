@@ -70,12 +70,22 @@ public partial class ProductsView : UserControl
     private async void OnEditProduct(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button btn) return;
-        if (btn.DataContext is not Product product) return;
+        if (btn.DataContext is not ProductViewModel productVm) return;
+        var product = productVm.Product; // Get the underlying Product model
 
         var window = this.VisualRoot as Window;
         if (window is null) return;
 
         var dlg = new AddProductWindow();
+        
+        // Update the window title and button text for edit mode
+        dlg.Title = "Edit Product";
+        var addButton = dlg.FindControl<Button>("AddButton");
+        if (addButton != null)
+        {
+            addButton.Content = "Update";
+        }
+        
         // Prefill existing values
         dlg.FindControl<TextBox>("NameBox")!.Text = product.Name;
         var categoryBox = dlg.FindControl<ComboBox>("CategoryBox");
@@ -83,7 +93,7 @@ public partial class ProductsView : UserControl
         {
             categoryBox.SelectedItem = product.Category;
         }
-        dlg.FindControl<TextBox>("PriceBox")!.Text = product.UnitPrice.ToString();
+        dlg.FindControl<TextBox>("PriceBox")!.Text = product.UnitPrice.ToString("F2");
         dlg.FindControl<TextBox>("QuantityBox")!.Text = product.Quantity.ToString();
         dlg.FindControl<TextBox>("SkuBox")!.Text = product.Sku; // keep existing SKU
 
@@ -129,33 +139,57 @@ public partial class ProductsView : UserControl
 
     private async void OnDeleteProduct(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button btn) return;
-        if (btn.DataContext is not Product product) return;
-
-        var window = this.VisualRoot as Window;
-        if (window is null) return;
-
-        var confirm = new ConfirmDialog();
-        var ok = await confirm.ShowAsync(window, $"Delete product '{product.Name}'?");
-        if (!ok) return;
-
         try
         {
-            using (var db = new AppDbContext())
+            if (sender is not Button btn) return;
+            
+            // Get the ProductViewModel from the DataContext
+            var productVm = btn.DataContext as ProductViewModel;
+            if (productVm == null) 
             {
-                var exists = await db.Products.FindAsync(product.Id);
-                if (exists is null) return;
-                db.Products.Remove(exists);
-                await db.SaveChangesAsync();
+                Console.WriteLine("Could not find product view model to delete");
+                return;
             }
 
-            await ShowInfoAsync(window, "Product deleted successfully.");
+            var window = this.VisualRoot as Window;
+            if (window is null) 
+            {
+                Console.WriteLine("Could not find parent window");
+                return;
+            }
+
+            var confirm = new ConfirmDialog();
+            var ok = await confirm.ShowAsync(window, $"Are you sure you want to delete '{productVm.Name}'?");
+            if (!ok) return;
+
+            using (var db = new AppDbContext())
+            {
+                var productToDelete = await db.Products.FindAsync(productVm.Id);
+                if (productToDelete != null)
+                {
+                    db.Products.Remove(productToDelete);
+                    await db.SaveChangesAsync();
+                    await ShowInfoAsync(window, $"Product '{productVm.Name}' was successfully deleted.");
+                }
+                else
+                {
+                    await ShowInfoAsync(window, "Product not found. It may have been already deleted.");
+                    return;
+                }
+            }
         }
         catch (Exception ex)
         {
-            await ShowInfoAsync(window, $"Failed to delete product: {ex.Message}");
+            Console.WriteLine($"Error deleting product: {ex}");
+            var window = this.VisualRoot as Window;
+            if (window != null)
+            {
+                await ShowInfoAsync(window, $"Failed to delete product: {ex.Message}");
+            }
+            return;
         }
 
+        // Refresh the products list and dashboard
         await RefreshProductsAndDashboardAsync();
     }
 
@@ -169,12 +203,14 @@ public partial class ProductsView : UserControl
     {
         if (DataContext is ProductsViewModel vm)
         {
-            await vm.ReloadAsync();
+            await vm.RefreshAsync();
         }
-        // Refresh dashboard stats if accessible
-        if (this.VisualRoot is Window win && win.DataContext is InventoryApp.ViewModels.MainWindowViewModel shell)
+
+        // Refresh dashboard if available
+        var mainWindow = this.VisualRoot as Window;
+        if (mainWindow?.DataContext is MainWindowViewModel mainVm)
         {
-            shell.DashboardVM.Refresh();
+            mainVm.DashboardVM.Refresh();
         }
     }
 }
