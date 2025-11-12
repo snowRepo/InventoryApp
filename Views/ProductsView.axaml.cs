@@ -7,6 +7,8 @@ using InventoryApp.Models;
 using InventoryApp.ViewModels;
 using Avalonia.Interactivity;
 using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryApp.Views;
 
@@ -35,24 +37,27 @@ public partial class ProductsView : UserControl
         {
             using (var db = new AppDbContext())
             {
-                string SanitizeSku(string s)
+                // Generate a unique SKU if not provided
+                string sku = !string.IsNullOrWhiteSpace(result.Sku) 
+                    ? result.Sku 
+                    : "P" + Guid.NewGuid().ToString("N").Substring(0, 5).ToUpper();
+
+                // Ensure SKU is unique
+                if (await db.Products.AnyAsync(p => p.Sku == sku))
                 {
-                    var sb = new System.Text.StringBuilder();
-                    foreach (var ch in (s ?? string.Empty).ToUpperInvariant())
-                    {
-                        if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')) sb.Append(ch);
-                        if (sb.Length >= 5) break;
-                    }
-                    return sb.ToString();
+                    await ShowInfoAsync(window, "Error: A product with this SKU already exists.");
+                    return;
                 }
+
                 var product = new Product
                 {
-                    Name = result.Name,
-                    Category = result.Category,
-                    Sku = SanitizeSku(result.Sku),
-                    UnitPrice = result.UnitPrice,
-                    Quantity = result.Quantity,
+                    Name = result.Name.Trim(),
+                    Category = result.Category.Trim(),
+                    Sku = sku,
+                    UnitPrice = Math.Round(result.UnitPrice, 2),
+                    Quantity = Math.Max(0, result.Quantity),
                 };
+                
                 db.Products.Add(product);
                 await db.SaveChangesAsync();
             }

@@ -49,11 +49,18 @@ public partial class SettingsViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveSettings()
     {
-        var currencyCode = SelectedCurrency.Split(' ')[0];
-        _settingsService.UpdateCurrency(currencyCode);
-        
-        // Show success message with close button
-        await ShowInfo("Settings saved successfully");
+        try 
+        {
+            var currencyCode = SelectedCurrency.Split(' ')[0];
+            _settingsService.UpdateCurrency(currencyCode);
+            
+            // Show success message
+            await ShowInfo("Settings saved successfully");
+        }
+        catch (Exception ex)
+        {
+            await ShowError($"Error saving settings: {ex.Message}");
+        }
     }
     
     private async Task ShowError(string message)

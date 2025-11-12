@@ -35,8 +35,16 @@ public partial class RegisterWindow : Window
 
         if (dlg.DataContext is MasterPinViewModel mvm)
         {
-            mvm.PinSubmitted += pin => { result = pin; tcs.TrySetResult(result); dlg.Close(); };
-            mvm.Canceled += () => { result = null; tcs.TrySetResult(result); dlg.Close(); };
+            mvm.PinSubmitted += pin => { 
+                result = pin; 
+                tcs.TrySetResult(result); 
+                dlg.Close(); 
+            };
+            mvm.Canceled += () => { 
+                result = null; 
+                tcs.TrySetResult(result); 
+                dlg.Close(); 
+            };
         }
 
         await dlg.ShowDialog(this);
@@ -45,11 +53,32 @@ public partial class RegisterWindow : Window
 
     private void OnRegistrationCompleted()
     {
-        Close(true);
+        // Set the dialog result and close
+        if (this is Window window)
+        {
+            // If this is a dialog, set the result
+            if (window is Window dialog)
+            {
+                dialog.Close(true);
+                return;
+            }
+        }
+        // If not a dialog, just close normally
+        Close();
     }
 
     private void OnRegistrationCanceled()
     {
-        Close(false);
+        if (this is Window window)
+        {
+            // If this is a dialog, set the result
+            if (window is Window dialog)
+            {
+                dialog.Close(false);
+                return;
+            }
+        }
+        // If not a dialog, just close normally
+        Close();
     }
 }
