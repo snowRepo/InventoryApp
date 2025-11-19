@@ -43,26 +43,52 @@
       </Border>
     </Grid>
 
-    <StackPanel Grid.Row="2" Margin="0,16,0,0" Spacing="8">
-      <TextBlock Text="Low stock" FontSize="16"/>
+    <StackPanel Grid.Row="2" Margin="0,16,0,0" Spacing="16">
+      <!-- Low stock section -->
+      <StackPanel Spacing="8">
+        <TextBlock Text="Low stock" FontSize="16" FontWeight="Bold"/>
 
-      <TextBlock Text="No low stock items. Low stock items will appear here."
-                 Opacity="0.7"
-                 IsVisible="{Binding NoLowStock}"/>
+        <TextBlock Text="No low stock items. Low stock items will appear here."
+                   Opacity="0.7"
+                   IsVisible="{Binding NoLowStock}"/>
 
-      <ItemsControl ItemsSource="{Binding LowStock}" IsVisible="{Binding HasLowStock}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:LowStockItem">
-            <Border Background="#FFFFFF" CornerRadius="6" Padding="10" BorderBrush="#E1E6EF" BorderThickness="1" Margin="0,4,0,0">
-              <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding FormattedUnitPrice}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="{Binding Quantity, StringFormat='{}{0} left'}" VerticalAlignment="Center"/>
-              </Grid>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+        <ItemsControl ItemsSource="{Binding LowStock}" IsVisible="{Binding HasLowStock}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:LowStockItem">
+              <Border Background="#FFFFFF" CornerRadius="6" Padding="10" BorderBrush="#E1E6EF" BorderThickness="1" Margin="0,4,0,0">
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                  <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="1" Text="{Binding FormattedUnitPrice}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Quantity, StringFormat='{}{0} left'}" VerticalAlignment="Center"/>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <!-- Near expiry section -->
+      <StackPanel Spacing="8">
+        <TextBlock Text="Nearing expiry (next 30 days)" FontSize="16" FontWeight="Bold"/>
+
+        <TextBlock Text="No products nearing expiry. Products with expiry dates close to today will appear here."
+                   Opacity="0.7"
+                   IsVisible="{Binding NoNearExpiry}"/>
+
+        <ItemsControl ItemsSource="{Binding NearExpiry}" IsVisible="{Binding HasNearExpiry}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:NearExpiryItem">
+              <Border Background="#FFFFFF" CornerRadius="6" Padding="10" BorderBrush="#E1E6EF" BorderThickness="1" Margin="0,4,0,0">
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                  <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="1" Text="{Binding FormattedExpiryDate}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="2" Text="{Binding DaysRemaining, StringFormat='{}{0} days left'}" VerticalAlignment="Center"/>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
     </StackPanel>
   </Grid>
 </UserControl>

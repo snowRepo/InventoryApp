@@ -35,13 +35,14 @@
         <StackPanel>
           <!-- Header -->
           <Border Padding="12,10" Background="#F4F4F5" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
-            <Grid ColumnDefinitions="*,*,*,*,*,*">
+            <Grid ColumnDefinitions="*,*,*,*,*,*,*">
               <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
               <TextBlock Grid.Column="1" Text="SKU" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
               <TextBlock Grid.Column="2" Text="Category" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
               <TextBlock Grid.Column="3" Text="Quantity" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
               <TextBlock Grid.Column="4" Text="Price" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
-              <TextBlock Grid.Column="5" Text="Actions" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+              <TextBlock Grid.Column="5" Text="Expiry" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+              <TextBlock Grid.Column="6" Text="Actions" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
             </Grid>
           </Border>
           <!-- Rows -->
@@ -49,7 +50,7 @@
             <ItemsControl.ItemTemplate>
               <DataTemplate>
                 <Border Padding="12,10" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
-                  <Grid ColumnDefinitions="*,*,*,*,*,*">
+                  <Grid ColumnDefinitions="*,*,*,*,*,*,*">
                     <TextBlock Grid.Column="0" 
                                Text="{Binding Name}" 
                                VerticalAlignment="Center" 
@@ -79,18 +80,23 @@
                                  VerticalAlignment="Center" 
                                  HorizontalAlignment="Center"/>
                     </DockPanel>
-                    <StackPanel Grid.Column="5" 
+                    <TextBlock Grid.Column="5" 
+                               Text="{Binding ExpiryDateText}"
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+                    <StackPanel Grid.Column="6" 
                                 Orientation="Horizontal" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
-                                Spacing="8">
+                                Spacing="4">
                       <Button Content="Edit" 
-                              MinWidth="70" 
-                              Padding="12,6" 
+                              MinWidth="56" 
+                              Padding="8,4" 
                               Click="OnEditProduct"/>
                       <Button Content="Delete" 
-                              MinWidth="70" 
-                              Padding="12,6" 
+                              MinWidth="56" 
+                              Padding="8,4" 
                               Click="OnDeleteProduct"/>
                     </StackPanel>
                   </Grid>

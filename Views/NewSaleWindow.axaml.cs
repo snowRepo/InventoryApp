@@ -69,8 +69,11 @@ public partial class NewSaleWindow : Window
         }
 
         using var db = new AppDbContext();
+        var today = DateTime.Today;
         var products = await db.Products
-            .Where(p => p.Name.ToLower().Contains(searchText.ToLower()) && p.Quantity > 0)
+            .Where(p => p.Name.ToLower().Contains(searchText.ToLower())
+                        && p.Quantity > 0
+                        && (!p.ExpiryDate.HasValue || p.ExpiryDate.Value.Date > today))
             .Take(10)
             .ToListAsync();
         
@@ -158,6 +161,14 @@ public partial class NewSaleWindow : Window
         if (_selectedProduct is null)
         {
             await ShowError("Please select a product");
+            return;
+        }
+
+        // Prevent selling expired products
+        var today = DateTime.Today;
+        if (_selectedProduct.ExpiryDate.HasValue && _selectedProduct.ExpiryDate.Value.Date <= today)
+        {
+            await ShowError("This product has expired and cannot be sold.");
             return;
         }
 

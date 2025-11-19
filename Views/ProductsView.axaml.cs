@@ -56,6 +56,7 @@ public partial class ProductsView : UserControl
                     Sku = sku,
                     UnitPrice = Math.Round(result.UnitPrice, 2),
                     Quantity = Math.Max(0, result.Quantity),
+                    ExpiryDate = result.ExpiryDate
                 };
                 
                 db.Products.Add(product);
@@ -101,6 +102,13 @@ public partial class ProductsView : UserControl
         dlg.FindControl<TextBox>("PriceBox")!.Text = product.UnitPrice.ToString("F2");
         dlg.FindControl<TextBox>("QuantityBox")!.Text = product.Quantity.ToString();
         dlg.FindControl<TextBox>("SkuBox")!.Text = product.Sku; // keep existing SKU
+        var expiryPicker = dlg.FindControl<DatePicker>("ExpiryDateBox");
+        if (expiryPicker != null)
+        {
+            expiryPicker.SelectedDate = product.ExpiryDate.HasValue
+                ? new DateTimeOffset(product.ExpiryDate.Value)
+                : (DateTimeOffset?)null;
+        }
 
         var result = await dlg.ShowDialog<AddProductWindow.AddProductResult?>(window);
         if (result is null) return;
@@ -115,6 +123,7 @@ public partial class ProductsView : UserControl
                 exists.Category = result.Category;
                 exists.UnitPrice = result.UnitPrice;
                 exists.Quantity = result.Quantity;
+                exists.ExpiryDate = result.ExpiryDate;
                 string SanitizeSku(string s)
                 {
                     var sb = new System.Text.StringBuilder();

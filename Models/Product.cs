@@ -1,3 +1,5 @@
+using System;
+
 namespace InventoryApp.Models;
 
 public class Product
@@ -8,4 +10,5 @@ public class Product
     public string Category { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
+    public DateTime? ExpiryDate { get; set; }
 }

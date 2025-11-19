@@ -57,6 +57,9 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
     public IReadOnlyList<LowStockItem> LowStock { get; private set; } = Array.Empty<LowStockItem>();
     public bool HasLowStock { get; private set; }
     public bool NoLowStock => !HasLowStock;
+    public IReadOnlyList<NearExpiryItem> NearExpiry { get; private set; } = Array.Empty<NearExpiryItem>();
+    public bool HasNearExpiry { get; private set; }
+    public bool NoNearExpiry => !HasNearExpiry;
 
     public void Refresh()
     {
@@ -93,6 +96,20 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
             LowStock = low;
             HasLowStock = low.Count > 0;
 
+            // Get products nearing expiry (within next 30 days)
+            var threshold = today.AddDays(30);
+            var nearExpiry = products
+                .Where(p => p.ExpiryDate.HasValue
+                            && p.ExpiryDate.Value.Date >= today
+                            && p.ExpiryDate.Value.Date <= threshold)
+                .OrderBy(p => p.ExpiryDate)
+                .ThenBy(p => p.Name)
+                .Select(p => new NearExpiryItem(p.Name, p.UnitPrice, p.Quantity, p.ExpiryDate!.Value, _settingsService))
+                .ToList();
+
+            NearExpiry = nearExpiry;
+            HasNearExpiry = nearExpiry.Count > 0;
+
             // Notify UI of all property changes
             OnPropertyChanged(nameof(TotalProducts));
             OnPropertyChanged(nameof(InventoryValue));
@@ -104,6 +121,9 @@ public partial class DashboardViewModel : ViewModelBase, IDisposable
             OnPropertyChanged(nameof(LowStock));
             OnPropertyChanged(nameof(HasLowStock));
             OnPropertyChanged(nameof(NoLowStock));
+            OnPropertyChanged(nameof(NearExpiry));
+            OnPropertyChanged(nameof(HasNearExpiry));
+            OnPropertyChanged(nameof(NoNearExpiry));
         }
         catch (Exception ex)
         {
@@ -130,6 +150,29 @@ public class LowStockItem : ObservableObject
         Name = name;
         UnitPrice = unitPrice;
         Quantity = quantity;
+        _settingsService = settingsService;
+    }
+}
+
+public class NearExpiryItem : ObservableObject
+{
+    private readonly UserSettingsService _settingsService;
+
+    public string Name { get; }
+    public decimal UnitPrice { get; }
+    public int Quantity { get; }
+    public DateTime ExpiryDate { get; }
+
+    public string FormattedUnitPrice => UnitPrice.FormatCurrency(_settingsService.CurrentSettings);
+    public string FormattedExpiryDate => ExpiryDate.ToShortDateString();
+    public int DaysRemaining => (ExpiryDate.Date - DateTime.Today).Days;
+
+    public NearExpiryItem(string name, decimal unitPrice, int quantity, DateTime expiryDate, UserSettingsService settingsService)
+    {
+        Name = name;
+        UnitPrice = unitPrice;
+        Quantity = quantity;
+        ExpiryDate = expiryDate.Date;
         _settingsService = settingsService;
     }
 }

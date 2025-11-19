@@ -22,6 +22,8 @@ public partial class ProductViewModel : ObservableObject, IDisposable
     public string FormattedUnitPrice => UnitPrice.FormatCurrency(_settingsService.CurrentSettings);
     public int Quantity => _product.Quantity;
     public string FormattedTotalValue => (UnitPrice * Quantity).FormatCurrency(_settingsService.CurrentSettings);
+    public DateTime? ExpiryDate => _product.ExpiryDate;
+    public string ExpiryDateText => _product.ExpiryDate?.ToShortDateString() ?? string.Empty;
 
     public ProductViewModel(Product product, UserSettingsService settingsService)
     {
